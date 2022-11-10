@@ -1,5 +1,6 @@
 package io.billie.functional
 
+import io.billie.functional.data.Fixtures
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -32,6 +33,18 @@ class CanStoreAndReadOrganisationAddressTest {
         .andExpect(status().isOk)
         .andExpect(content().contentType(APPLICATION_JSON))
         .andExpect(content().string("{}"))
+    }
+
+    @Test
+    fun cannotStoreAddressWhenStreetIsBlank() {
+        val orgId = UUID.randomUUID()
+
+        mockMvc.perform(
+            put("/organisations/$orgId/address")
+                .contentType(APPLICATION_JSON)
+                .content(Fixtures.addressRequestJsonStreetBlank())
+        )
+            .andExpect(status().isBadRequest)
     }
 
 }
