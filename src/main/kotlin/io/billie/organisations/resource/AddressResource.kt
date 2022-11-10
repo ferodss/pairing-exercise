@@ -1,5 +1,6 @@
 package io.billie.organisations.resource
 
+import io.billie.organisations.data.UnableToFindCity
 import io.billie.organisations.data.UnableToFindCountry
 import io.billie.organisations.service.AddressService
 import io.billie.organisations.viewmodel.AddressRequest
@@ -35,6 +36,8 @@ class AddressResource(val service: AddressService) {
 
             return Entity(id)
         } catch (e: UnableToFindCountry) {
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, e.message)
+        } catch (e: UnableToFindCity) {
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, e.message)
         }
     }
