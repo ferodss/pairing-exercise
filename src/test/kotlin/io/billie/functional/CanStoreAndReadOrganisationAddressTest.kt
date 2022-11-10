@@ -83,4 +83,16 @@ class CanStoreAndReadOrganisationAddressTest {
             .andExpect(status().isBadRequest)
     }
 
+    @Test
+    fun cannotStoreAddressWhenCountryCodeIsNotRecognised() {
+        val orgId = UUID.randomUUID()
+
+        mockMvc.perform(
+            put("/organisations/$orgId/address")
+                .contentType(APPLICATION_JSON)
+                .content(Fixtures.addressRequestJsonCountryCodeIncorrect())
+        )
+            .andExpect(status().isBadRequest)
+    }
+
 }
