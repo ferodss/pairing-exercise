@@ -158,5 +158,13 @@ object Fixtures {
                 "}"
     }
 
+    fun addressRequestJsonNoStreet(): String {
+        return "{\n" +
+                "  \"number\": \"1234\",\n" +
+                "  \"postal_code\": \"10558\",\n" +
+                "  \"country_code\": \"GB\",\n" +
+                "  \"city_id\": \"ca1a7992-613c-11ed-9b6a-0242ac120002\",\n" +
+                "}"
+    }
 
 }
