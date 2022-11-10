@@ -95,4 +95,16 @@ class CanStoreAndReadOrganisationAddressTest {
             .andExpect(status().isBadRequest)
     }
 
+    @Test
+    fun cannotStoreAddressWhenCityIdIsBlank() {
+        val orgId = UUID.randomUUID()
+
+        mockMvc.perform(
+            put("/organisations/$orgId/address")
+                .contentType(APPLICATION_JSON)
+                .content(Fixtures.addressRequestJsonCityIdBlank())
+        )
+            .andExpect(status().isBadRequest)
+    }
+
 }
