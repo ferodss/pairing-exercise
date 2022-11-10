@@ -26,7 +26,7 @@ class AddressResource(val service: AddressService) {
     }
 
     @PutMapping
-    fun put(@PathVariable orgId: String, @Valid @RequestBody address: AddressRequest): Entity {
+    fun put(@PathVariable orgId: UUID, @Valid @RequestBody address: AddressRequest): Entity {
         val id = UUID.randomUUID()
         return Entity(id)
     }
