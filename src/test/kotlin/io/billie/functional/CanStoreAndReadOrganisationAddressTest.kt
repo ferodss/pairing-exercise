@@ -30,9 +30,9 @@ class CanStoreAndReadOrganisationAddressTest {
         mockMvc.perform(
             get("/organisations/$orgId/address").contentType(APPLICATION_JSON)
         )
-        .andExpect(status().isOk)
-        .andExpect(content().contentType(APPLICATION_JSON))
-        .andExpect(content().string("{}"))
+            .andExpect(status().isOk)
+            .andExpect(content().contentType(APPLICATION_JSON))
+            .andExpect(content().string("{}"))
     }
 
     @Test
@@ -119,4 +119,15 @@ class CanStoreAndReadOrganisationAddressTest {
             .andExpect(status().isBadRequest)
     }
 
+    @Test
+    fun cannotStoreAddressWhenCityIsNotRecognised() {
+        val orgId = UUID.randomUUID()
+
+        mockMvc.perform(
+            put("/organisations/$orgId/address")
+                .contentType(APPLICATION_JSON)
+                .content(Fixtures.addressRequestJsonCityIncorrect())
+        )
+            .andExpect(status().isBadRequest)
+    }
 }
