@@ -205,4 +205,13 @@ object Fixtures {
                 "  \"city_id\": \"\"\n" +
                 "}"
     }
+
+    fun addressRequestJsonNoCityId(): String {
+        return "{\n" +
+                "  \"street\": \"Somestrasse\",\n" +
+                "  \"number\": \"1234\",\n" +
+                "  \"postal_code\": \"10558\",\n" +
+                "  \"country_code\": \"GB\"\n" +
+                "}"
+    }
 }
