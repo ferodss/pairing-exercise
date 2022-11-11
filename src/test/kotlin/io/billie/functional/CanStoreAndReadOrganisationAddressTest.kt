@@ -1,6 +1,10 @@
 package io.billie.functional
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import io.billie.functional.data.Fixtures
+import io.billie.organisations.viewmodel.Entity
+import org.hamcrest.MatcherAssert
+import org.hamcrest.core.IsEqual
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -8,6 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.boot.test.web.server.LocalServerPort
+import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
@@ -22,6 +27,12 @@ class CanStoreAndReadOrganisationAddressTest {
 
     @Autowired
     private lateinit var mockMvc: MockMvc
+
+    @Autowired
+    private lateinit var template: JdbcTemplate
+
+    @Autowired
+    private lateinit var mapper: ObjectMapper
 
     @Test
     fun orgHasNoAddressByDefault() {
@@ -130,4 +141,42 @@ class CanStoreAndReadOrganisationAddressTest {
         )
             .andExpect(status().isBadRequest)
     }
+
+    @Test
+    fun canStoreOrgAddress() {
+        val orgId = UUID.randomUUID()
+        val cityId = UUID.randomUUID()
+
+        givenCityExists(cityId, "GB")
+
+        val result = mockMvc.perform(
+            put("/organisations/$orgId/address")
+                .contentType(APPLICATION_JSON)
+                .content(Fixtures.addressRequestJson(cityId))
+        )
+            .andExpect(status().isOk)
+            .andReturn()
+
+        val response = mapper.readValue(result.response.contentAsString, Entity::class.java)
+
+        val address: Map<String, Any> = addressFromDatabase(response.id)
+        assertDataMatches(address, Fixtures.bbcAddressFixture(response.id, cityId))
+    }
+
+    fun assertDataMatches(reply: Map<String, Any>, assertions: Map<String, Any>) {
+        for (key in assertions.keys) {
+            MatcherAssert.assertThat(reply[key], IsEqual.equalTo(assertions[key]))
+        }
+    }
+
+    private fun givenCityExists(cityId: UUID, countryCode: String) =
+        template.update(
+            "INSERT into organisations_schema.cities (\"id\", \"name\", \"country_code\") VALUES (?, ?, ?);",
+            cityId,
+            "Random City",
+            countryCode
+        )
+
+    private fun addressFromDatabase(id: UUID): MutableMap<String, Any> =
+        template.queryForMap("select * from organisations_schema.cities where id = ?", id)
 }

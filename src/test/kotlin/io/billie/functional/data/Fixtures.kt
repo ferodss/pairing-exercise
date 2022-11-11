@@ -224,4 +224,25 @@ object Fixtures {
                 "  \"city_id\": \"ca1a7992-613c-11ed-9b6a-0242ac120002\"\n" +
                 "}"
     }
+
+    fun addressRequestJson(cityId: UUID): String {
+        return "{\n" +
+                "  \"street\": \"Somestrasse\",\n" +
+                "  \"number\": \"1234\",\n" +
+                "  \"postal_code\": \"10558\",\n" +
+                "  \"country_code\": \"GB\",\n" +
+                "  \"city_id\": \"$cityId\"\n" +
+                "}"
+    }
+
+    fun bbcAddressFixture(id: UUID, cityId: UUID): Map<String, Any> {
+        val data = HashMap<String, Any>()
+        data["id"] = id
+        data["street"] = "Somestrasse"
+        data["number"] = "1234"
+        data["postal_code"] = "10558"
+        data["country_code"] = "GB"
+        data["city_id"] = cityId
+        return data
+    }
 }
