@@ -2,6 +2,7 @@ package io.billie.organisations.service
 
 import io.billie.countries.data.CityRepository
 import io.billie.countries.data.CountryRepository
+import io.billie.organisations.data.AddressRepository
 import io.billie.organisations.data.UnableToFindCity
 import io.billie.organisations.data.UnableToFindCountry
 import io.billie.organisations.viewmodel.AddressRequest
@@ -11,6 +12,7 @@ import java.util.*
 
 @Service
 class AddressService(
+    val db: AddressRepository,
     val countries: CountryRepository,
     val cities: CityRepository
 ) {
@@ -31,6 +33,6 @@ class AddressService(
             throw UnableToFindCity(address.cityId, address.countryCode)
         }
 
-        return UUID.randomUUID()
+        return db.create(orgId, address)
     }
 }
