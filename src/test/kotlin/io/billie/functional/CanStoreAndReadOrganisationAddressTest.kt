@@ -3,6 +3,7 @@ package io.billie.functional
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.billie.functional.data.Fixtures
 import io.billie.organisations.viewmodel.Entity
+import io.billie.organisations.viewmodel.LegalEntityType
 import org.hamcrest.MatcherAssert
 import org.hamcrest.core.IsEqual
 import org.junit.jupiter.api.Test
@@ -16,6 +17,7 @@ import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
+import java.time.LocalDateTime
 import java.util.*
 
 @AutoConfigureMockMvc
@@ -147,6 +149,7 @@ class CanStoreAndReadOrganisationAddressTest {
         val orgId = UUID.randomUUID()
         val cityId = UUID.randomUUID()
 
+        givenOrganisationExists(orgId)
         givenCityExists(cityId, "GB")
 
         val result = mockMvc.perform(
@@ -165,9 +168,35 @@ class CanStoreAndReadOrganisationAddressTest {
 
     fun assertDataMatches(reply: Map<String, Any>, assertions: Map<String, Any>) {
         for (key in assertions.keys) {
-            MatcherAssert.assertThat(reply[key], IsEqual.equalTo(assertions[key]))
+            MatcherAssert.assertThat(
+                reply[key]!!::class.java.typeName + "-" + assertions[key]!!::class.java.typeName,
+                reply[key],
+                IsEqual.equalTo(assertions[key])
+            )
         }
     }
+
+    private fun givenOrganisationExists(orgId: UUID) =
+        template.update(
+            "INSERT INTO organisations_schema.organisations (" +
+                    "id," +
+                    "name, " +
+                    "date_founded, " +
+                    "country_code, " +
+                    "vat_number, " +
+                    "registration_number, " +
+                    "legal_entity_type, " +
+                    "contact_details_id" +
+                    ") VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            orgId,
+            "My test org",
+            LocalDateTime.now(),
+            "GB",
+            "DE 123456789",
+            "123456",
+            LegalEntityType.C_CORPORATION.toString(),
+            UUID.randomUUID()
+        )
 
     private fun givenCityExists(cityId: UUID, countryCode: String) =
         template.update(
@@ -178,5 +207,5 @@ class CanStoreAndReadOrganisationAddressTest {
         )
 
     private fun addressFromDatabase(id: UUID): MutableMap<String, Any> =
-        template.queryForMap("select * from organisations_schema.cities where id = ?", id)
+        template.queryForMap("select * from organisations_schema.addresses where id = ?", id)
 }

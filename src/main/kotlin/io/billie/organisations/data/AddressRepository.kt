@@ -35,7 +35,7 @@ class AddressRepository {
             address.number?.let { ps.setInt(3, it) }
             ps.setString(4, address.postalCode)
             ps.setString(5, address.countryCode)
-            ps.setString(6, address.cityId)
+            ps.setObject(6, UUID.fromString(address.cityId))
             ps
         }, keyHolder)
 
